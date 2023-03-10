@@ -1,0 +1,79 @@
+from tkinter import Tk, Label, Text, Button, OptionMenu, StringVar, END
+import openai
+from tkinter import *
+openai.api_key = "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"
+
+def generate_text(prompt, model, max_length=50):
+    response = openai.Completion.create(
+        engine=model,
+        prompt=prompt,
+        max_tokens=max_length
+    )
+    return response.choices[0].text.strip()
+
+def translate_text():
+    # Get user input
+    text = input_box.get("1.0", END)
+    word_count = int(word_count_box.get())
+    text = ' '.join(text.split()[:word_count])
+
+    # Determine essay type
+    essay_type = essay_type_var.get()
+
+    # Translate text
+    des_language = des_language_var.get()
+    translation = generate_text(text, f"translate_{des_language}")
+
+    # Generate paragraph using ChatGPT API
+    prompt = f"{essay_type}: {translation}"
+    response = generate_text(prompt, "text-davinci-002", max_length=150)
+    output_box.delete("1.0", END)
+    output_box.insert(END, response)
+
+root = Tk()
+
+# Add essay type selection
+essay_type_var = StringVar()
+essay_type_var.set("Paragraf")
+essay_type_label = Label(root, text="Essay tipi:").grid(row=3, column=0, sticky="W")
+essay_type_menu = OptionMenu(root, essay_type_var, "Paragraf", "Essay", "Makale")
+essay_type_menu.grid(row=3, column=1, sticky="W")
+
+# Add language selection
+des_language_var = StringVar()
+des_language_var.set("en")
+des_language_label = Label
+
+language_options = ["İngilizce", "Almanca", "Fransızca", "İtalyanca", "İspanyolca", "Türkçe"]
+root = Tk()
+root.title("Yazı Üretici")
+des_language_var = StringVar()
+des_language_var.set("İngilizce")
+language_label = Label(root, text="Çeviri için hedef dil:").grid(row=0, column=0, sticky=W)
+language_menu = OptionMenu(root, des_language_var, *language_options)
+language_menu.grid(row=0, column=1, sticky=W)
+
+
+input_label = Label(root, text="Kelime kutusu:").grid(row=1, column=0, sticky=W)
+input_box = Text(root, height=10, width=50)
+input_box.grid(row=2, column=0, columnspan=2)
+
+word_count_label = Label(root, text="Kaç kelime kullanmak istersiniz?").grid(row=3, column=2, sticky=W)
+word_count_box = Spinbox(root, from_=1, to=100, width=5)
+word_count_box.grid(row=4, column=2)
+
+generate_button = Button(root, text="Yazı Üret", command=translate_text).grid(row=5, column=0)
+
+output_label = Label(root, text="Oluşturulan Yazı:").grid(row=6, column=0, sticky=W)
+
+output_box = Text(root, height=10, width=50)
+
+output_box = Text(root, height=10, width=50)
+
+output_box.grid(row=7, column=0, columnspan=2, padx=5, pady=5)
+
+generate_button = Button(root, text="Oluştur", command=translate_text).grid(row=8, column=0, columnspan=2, padx=5, pady=5)
+
+
+root.mainloop()
+
